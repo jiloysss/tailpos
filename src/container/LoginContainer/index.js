@@ -36,7 +36,7 @@ export default class LoginContainer extends React.Component {
       status: "Pin",
       activationKey: "",
       password: "",
-      url: ""
+      url: "",
     };
   }
 
@@ -120,26 +120,25 @@ export default class LoginContainer extends React.Component {
   }
 
   onCodeInputClose() {
-    this.changeStateValues("verificationVisible",false);
+    this.changeStateValues("verificationVisible", false);
   }
 
   registered() {
     this.props.loginForm.registered();
   }
 
-  changeStateValues = (key,value) => {
-      this.setState(this.changeValue(key,value));
-  }
-  changeValue = (key,value) => {
-      return {
-        [key]: value
-      };
-  }
-   onLogin = async () => {
-      await fetch_data_via_activation_key(this.state);
-  }
+  changeStateValues = (key, value) => {
+    this.setState(this.changeValue(key, value));
+  };
+  changeValue = (key, value) => {
+    return {
+      [key]: value,
+    };
+  };
+  onLogin = async () => {
+    await fetch_data_via_activation_key(this.state);
+  };
   render() {
-
     strings.setLanguage(currentLanguage().companyLanguage);
     return (
       <Login
@@ -149,8 +148,7 @@ export default class LoginContainer extends React.Component {
         onVerify={code => this.onVerify(code)}
         onResend={() => this.onResend()}
         onCodeInputClose={() => this.onCodeInputClose()}
-        changeStateValues={(key,value) => this.changeStateValues(key,value)}
-
+        changeStateValues={(key, value) => this.changeStateValues(key, value)}
       />
     );
   }

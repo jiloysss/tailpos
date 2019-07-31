@@ -17,21 +17,25 @@ class Login extends React.Component {
   render() {
     const LoginComponent =
       this.props.values.loginStatus === "idle" ? (
-          this.props.values.status === "Pin" ? (
-              <EmailFormComponent
-                  submitText="Set Pin"
-                  onSubmit={() => this.props.onSetPin()}
-                  changeStateValues={(status,value)=>this.props.changeStateValues(status,value)}
-                  values={this.props.values}
-              />
-          ) : (
-              <AnotherWayToLoginComponent
-                  onLogin={this.props.onLogin}
-                  changeStateValues={(status,value)=>this.props.changeStateValues(status,value)}
-                  values={this.props.values}
-                  submitText="Login"
-              />
-              )
+        this.props.values.status === "Pin" ? (
+          <EmailFormComponent
+            submitText="Set Pin"
+            onSubmit={() => this.props.onSetPin()}
+            changeStateValues={(status, value) =>
+              this.props.changeStateValues(status, value)
+            }
+            values={this.props.values}
+          />
+        ) : (
+          <AnotherWayToLoginComponent
+            onLogin={this.props.onLogin}
+            changeStateValues={(status, value) =>
+              this.props.changeStateValues(status, value)
+            }
+            values={this.props.values}
+            submitText="Login"
+          />
+        )
       ) : (
         <Spinner color="white" />
       );
@@ -66,11 +70,9 @@ class Login extends React.Component {
                 textAlign: "center",
               }}
             >
-                {this.props.values.status === "Pin" ? (
-              strings.SetOwnerPin
-              ) : (
-                strings.Login
-                )}
+              {this.props.values.status === "Pin"
+                ? strings.SetOwnerPin
+                : strings.Login}
             </Text>
             {LoginComponent}
           </View>

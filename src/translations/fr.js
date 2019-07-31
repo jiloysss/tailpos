@@ -450,6 +450,5 @@ export default {
   AreYouSureYouWantToRestoreDefaultSettings:
     "Are you sure you want to restore default settings?",
   DefaultSettingsRestored: "Default Settings Restored",
-    SelectEmployee: "Select Employee"
-
+  SelectEmployee: "Select Employee",
 };

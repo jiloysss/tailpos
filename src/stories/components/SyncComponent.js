@@ -52,8 +52,8 @@ class CompanyComponent extends React.PureComponent {
       toggleIsHttps,
       setDeviceId,
       deviceId,
-        toggleAutomatic,
-        isAutomatic
+      toggleAutomatic,
+      isAutomatic,
     } = this.props;
     strings.setLanguage(currentLanguage().companyLanguage);
 

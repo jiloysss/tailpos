@@ -186,7 +186,7 @@ const StateStore = types
     toggleHttps() {
       self.isHttps = !self.isHttps;
     },
-      toggleAutomatic() {
+    toggleAutomatic() {
       self.isAutomatic = !self.isAutomatic;
     },
     setDeviceId(deviceId) {
@@ -195,7 +195,7 @@ const StateStore = types
     toggleIsStackItem() {
       self.isStackItem = !self.isStackItem;
     },
-      changeCheckBox(isHttps,isAutomatic) {
+    changeCheckBox(isHttps, isAutomatic) {
       self.isHttps = isHttps;
       self.isAutomatic = isAutomatic;
     },

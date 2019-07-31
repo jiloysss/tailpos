@@ -244,7 +244,6 @@ class AddAttendantComponent extends React.Component {
   }
 }
 
-
 const styles = StyleSheet.create({
   view: {
     width: "50%",

@@ -126,10 +126,9 @@ export default class SettingsContainer extends React.Component {
         "Settings",
       );
       this.props.stateStore.changeCheckBox(
-          this.props.printerStore.sync[0].isHttps,
-          this.props.printerStore.sync[0].isAutomatic
+        this.props.printerStore.sync[0].isHttps,
+        this.props.printerStore.sync[0].isAutomatic,
       );
-
     }
     for (let i = 0; i < this.props.printerStore.rows.length; i += 1) {
       if (this.props.printerStore.rows[i].defaultPrinter) {
@@ -710,29 +709,29 @@ export default class SettingsContainer extends React.Component {
     } else {
       this.props.printerStore.addSync({
         url: this.props.stateStore.settings_state[0].url,
-          isHttps: this.props.stateStore.isHttps,
-          isAutomatic: this.props.stateStore.isAutomatic,
+        isHttps: this.props.stateStore.isHttps,
+        isAutomatic: this.props.stateStore.isAutomatic,
         user_name: this.props.stateStore.settings_state[0].user_name,
         password: this.props.stateStore.settings_state[0].password,
       });
     }
-    if (this.props.stateStore.isHttps){
-        const storeProps = this.props;
-        BackgroundJob.cancel({ jobKey: "AutomaticSync" });
-        const backgroundJob = {
-            jobKey: "myJob",
-            job: () => syncObjectValues("sync", storeProps, true),
-        };
-        BackgroundJob.register(backgroundJob);
-        var backgroundSchedule = {
-            jobKey: "myJob",
-            period: 360000,
-            allowExecutionInForeground: true,
-            networkType: BackgroundJob.NETWORK_TYPE_UNMETERED,
-        };
-        BackgroundJob.schedule(backgroundSchedule);
+    if (this.props.stateStore.isHttps) {
+      const storeProps = this.props;
+      BackgroundJob.cancel({ jobKey: "AutomaticSync" });
+      const backgroundJob = {
+        jobKey: "myJob",
+        job: () => syncObjectValues("sync", storeProps, true),
+      };
+      BackgroundJob.register(backgroundJob);
+      var backgroundSchedule = {
+        jobKey: "myJob",
+        period: 360000,
+        allowExecutionInForeground: true,
+        networkType: BackgroundJob.NETWORK_TYPE_UNMETERED,
+      };
+      BackgroundJob.schedule(backgroundSchedule);
     } else {
-        BackgroundJob.cancel({ jobKey: "myJob" });
+      BackgroundJob.cancel({ jobKey: "myJob" });
     }
     saveConfig(this.props.stateStore);
     this.props.stateStore.changeValue("syncEditStatus", false, "Settings");

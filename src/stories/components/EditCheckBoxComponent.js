@@ -18,7 +18,7 @@ class EditCheckBoxComponent extends React.PureComponent {
       onPress();
     }
   };
-    onPressAutomatic = () => {
+  onPressAutomatic = () => {
     const { disabled, onPressAutomatic } = this.props;
     if (disabled) {
       Toast.show({
@@ -26,38 +26,41 @@ class EditCheckBoxComponent extends React.PureComponent {
         buttonText: "Okay",
       });
     } else {
-        onPressAutomatic();
+      onPressAutomatic();
     }
   };
 
   render() {
     strings.setLanguage(currentLanguage().companyLanguage);
 
-    const { automaticLabel, checked, automaticChecked, label, disabled } = this.props;
+    const {
+      automaticLabel,
+      checked,
+      automaticChecked,
+      label,
+      disabled,
+    } = this.props;
     return (
-        <View>
-          <View style={styles.view}>
-            <CheckBox
-              checked={checked}
-              color={disabled ? "#cfcfcf" : "#ca94ff"}
-              style={styles.checkbox}
-              onPress={this.onPress}
-            />
-            <Text style={styles.text}>{label}</Text>
-
-          </View>
-          <View style={styles.view1}>
-            <CheckBox
-              checked={automaticChecked}
-              color={disabled ? "#cfcfcf" : "#ca94ff"}
-              style={styles.checkbox}
-              onPress={this.onPressAutomatic}
-            />
-            <Text style={styles.text}>{automaticLabel}</Text>
-
-          </View>
-
+      <View>
+        <View style={styles.view}>
+          <CheckBox
+            checked={checked}
+            color={disabled ? "#cfcfcf" : "#ca94ff"}
+            style={styles.checkbox}
+            onPress={this.onPress}
+          />
+          <Text style={styles.text}>{label}</Text>
         </View>
+        <View style={styles.view1}>
+          <CheckBox
+            checked={automaticChecked}
+            color={disabled ? "#cfcfcf" : "#ca94ff"}
+            style={styles.checkbox}
+            onPress={this.onPressAutomatic}
+          />
+          <Text style={styles.text}>{automaticLabel}</Text>
+        </View>
+      </View>
     );
   }
 }
@@ -68,7 +71,7 @@ const styles = StyleSheet.create({
     paddingLeft: 17,
     paddingRight: 17,
   },
-    view1: {
+  view1: {
     flexDirection: "row",
     paddingLeft: 17,
     paddingRight: 17,
@@ -77,9 +80,9 @@ const styles = StyleSheet.create({
   checkbox: {
     left: 0,
   },
-    checkbox1: {
-        left: 10,
-    },
+  checkbox1: {
+    left: 10,
+  },
   text: {
     marginLeft: 10,
   },

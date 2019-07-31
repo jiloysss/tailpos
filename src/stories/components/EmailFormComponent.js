@@ -22,7 +22,7 @@ const EmailFormComponent = props => {
         <Input
           placeholder={strings.Name}
           value={props.values.userName}
-          onChangeText={text => props.changeStateValues("userName",text)}
+          onChangeText={text => props.changeStateValues("userName", text)}
         />
       </Item>
       <Item
@@ -35,14 +35,19 @@ const EmailFormComponent = props => {
           keyboardType="numeric"
           placeholder={strings.Pin}
           value={props.values.pin}
-          onChangeText={text => props.changeStateValues("pin",text)}
+          onChangeText={text => props.changeStateValues("pin", text)}
           secureTextEntry={props.values.securityPinStatus}
         />
         <Icon
           active
           name={props.values.securityPinStatus ? "eye-off" : "eye"}
           size={30}
-          onPress={() => props.changeStateValues("securityPinStatus", !props.values.securityPinStatus)}
+          onPress={() =>
+            props.changeStateValues(
+              "securityPinStatus",
+              !props.values.securityPinStatus,
+            )
+          }
         />
       </Item>
       <Item
@@ -54,7 +59,7 @@ const EmailFormComponent = props => {
         <Input
           placeholder={strings.ConfirmPin}
           value={props.values.confirmPin}
-          onChangeText={text => props.changeStateValues("confirmPin",text)}
+          onChangeText={text => props.changeStateValues("confirmPin", text)}
           keyboardType="numeric"
           secureTextEntry={props.values.securityConfirmPinStatus}
         />
@@ -62,7 +67,12 @@ const EmailFormComponent = props => {
           active
           name={props.values.securityConfirmPinStatus ? "eye-off" : "eye"}
           size={30}
-          onPress={() => props.changeStateValues("securityConfirmPinStatus", !props.values.securityConfirmPinStatus)}
+          onPress={() =>
+            props.changeStateValues(
+              "securityConfirmPinStatus",
+              !props.values.securityConfirmPinStatus,
+            )
+          }
         />
       </Item>
       <Button
@@ -72,27 +82,26 @@ const EmailFormComponent = props => {
       >
         <Text>{props.submitText}</Text>
       </Button>
-        <View style={styles.view}>
-            <TouchableOpacity onPress={()=> props.changeStateValues("status","Activation")}>
-                <Text style={styles.text}>Another Way to Login</Text>
-            </TouchableOpacity>
-        </View>
+      <View style={styles.view}>
+        <TouchableOpacity
+          onPress={() => props.changeStateValues("status", "Activation")}
+        >
+          <Text style={styles.text}>Another Way to Login</Text>
+        </TouchableOpacity>
+      </View>
     </Form>
-
   );
 };
 
 const styles = StyleSheet.create({
-    view: {
-        height: 50,
-        width: 350,
-        justifyContent: "center",
-        alignItems: "center",
-
-    },
-    text: {
-        color: "blue"
-
-    }
+  view: {
+    height: 50,
+    width: 350,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  text: {
+    color: "blue",
+  },
 });
 export default EmailFormComponent;

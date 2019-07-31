@@ -295,6 +295,5 @@ export default {
   PleaseSelectAnyAttendant: "يرجى اختيار أي مضيف",
   PINError: " خطأ PIN ",
   PleaseEnterTheCorrectPINNumber: "الرجاء إدخال رقم التعريف الشخصي الصحيح",
-    SelectEmployee: "Select Employee"
-
+  SelectEmployee: "Select Employee",
 };

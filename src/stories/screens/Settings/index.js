@@ -161,8 +161,8 @@ class Settings extends React.Component {
       companyLanguage,
       changeEditStatus,
       editStatus,
-        isAutomatic,
-        toggleAutomatic
+      isAutomatic,
+      toggleAutomatic,
     } = this.props;
 
     if (this.props.returnValue === strings.Bluetooth) {

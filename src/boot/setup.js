@@ -7,8 +7,6 @@ import App from "../App";
 import getTheme from "../theme/components";
 import variables from "../theme/variables/platform";
 
-
-
 export default function(stores) {
   return class Setup extends React.Component {
     constructor(props) {
