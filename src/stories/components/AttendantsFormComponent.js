@@ -17,7 +17,7 @@ class AddAttendantComponent extends React.Component {
       confirmPin: "",
       securityPinStatus: true,
       securityConfirmPinStatus: true,
-      status: "Save Attendant",
+      status: "Save Employee",
       role: "Owner",
       canLogin: false,
       commission: "",
@@ -243,6 +243,7 @@ class AddAttendantComponent extends React.Component {
     );
   }
 }
+
 
 const styles = StyleSheet.create({
   view: {

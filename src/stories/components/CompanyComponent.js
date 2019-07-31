@@ -48,7 +48,8 @@ class CompanyComponent extends React.PureComponent {
           <CardItem style={styles.cardItem}>
             <Grid>
               <Col style={styles.col}>
-                <Text style={styles.titleText}>{strings.CompanySettings}</Text>
+                {/*<Text style={styles.titleText}>{strings.CompanySettings}</Text>*/}
+                <Text style={styles.titleText}>Merchant</Text>
               </Col>
               <Col>
                 <View style={styles.viewRight}>

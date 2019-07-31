@@ -52,6 +52,8 @@ class CompanyComponent extends React.PureComponent {
       toggleIsHttps,
       setDeviceId,
       deviceId,
+        toggleAutomatic,
+        isAutomatic
     } = this.props;
     strings.setLanguage(currentLanguage().companyLanguage);
 
@@ -99,8 +101,11 @@ class CompanyComponent extends React.PureComponent {
 
           <EditCheckBox
             label="Is HTTPs"
+            automaticLabel="Automatic Sync - (It will sync every 6 min)"
             checked={isHttps}
+            automaticChecked={isAutomatic}
             onPress={toggleIsHttps}
+            onPressAutomatic={toggleAutomatic}
             disabled={!syncEditStatus}
           />
           <EditInput

@@ -76,7 +76,8 @@ class AddAttendantComponent extends React.PureComponent {
           <CardItem style={styles.cardItem}>
             <Grid>
               <Col>
-                <Text style={styles.titleText}>{strings.Attendant}</Text>
+                {/*<Text style={styles.titleText}>{strings.Attendant}</Text>*/}
+                <Text style={styles.titleText}>Employees</Text>
               </Col>
               <Col>
                 <TouchableOpacity

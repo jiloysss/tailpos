@@ -100,7 +100,7 @@ export default class Sidebar extends React.Component {
       },
       {
         route: "Pin",
-        caption: strings.LogoutAttendant,
+        caption: "Logout",
         icon: "arrow-right",
       },
     ];

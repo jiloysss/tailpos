@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Form, Item, Input, Button, Text } from "native-base";
+import { TouchableOpacity, StyleSheet } from "react-native";
+import { Form, Item, Input, Button, Text, View } from "native-base";
 import { currentLanguage } from "../../translations/CurrentLanguage";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -20,8 +21,8 @@ const EmailFormComponent = props => {
         <Icon active name="account" size={30} />
         <Input
           placeholder={strings.Name}
-          value={props.userName}
-          onChangeText={text => props.onNameChange(text)}
+          value={props.values.userName}
+          onChangeText={text => props.changeStateValues("userName",text)}
         />
       </Item>
       <Item
@@ -33,15 +34,15 @@ const EmailFormComponent = props => {
         <Input
           keyboardType="numeric"
           placeholder={strings.Pin}
-          value={props.pin}
-          onChangeText={text => props.onPinChange(text)}
-          secureTextEntry={props.securityPinStatus}
+          value={props.values.pin}
+          onChangeText={text => props.changeStateValues("pin",text)}
+          secureTextEntry={props.values.securityPinStatus}
         />
         <Icon
           active
-          name={props.securityPinStatus ? "eye-off" : "eye"}
+          name={props.values.securityPinStatus ? "eye-off" : "eye"}
           size={30}
-          onPress={props.onPinSecurityStatus}
+          onPress={() => props.changeStateValues("securityPinStatus", !props.values.securityPinStatus)}
         />
       </Item>
       <Item
@@ -52,16 +53,16 @@ const EmailFormComponent = props => {
         <Icon active name="lock-open" size={30} />
         <Input
           placeholder={strings.ConfirmPin}
-          value={props.confirmPin}
-          onChangeText={text => props.onConfirmPinChange(text)}
+          value={props.values.confirmPin}
+          onChangeText={text => props.changeStateValues("confirmPin",text)}
           keyboardType="numeric"
-          secureTextEntry={props.securityConfirmPinStatus}
+          secureTextEntry={props.values.securityConfirmPinStatus}
         />
         <Icon
           active
-          name={props.securityConfirmPinStatus ? "eye-off" : "eye"}
+          name={props.values.securityConfirmPinStatus ? "eye-off" : "eye"}
           size={30}
-          onPress={props.onConfirmPinSecurityStatus}
+          onPress={() => props.changeStateValues("securityConfirmPinStatus", !props.values.securityConfirmPinStatus)}
         />
       </Item>
       <Button
@@ -71,8 +72,27 @@ const EmailFormComponent = props => {
       >
         <Text>{props.submitText}</Text>
       </Button>
+        <View style={styles.view}>
+            <TouchableOpacity onPress={()=> props.changeStateValues("status","Activation")}>
+                <Text style={styles.text}>Another Way to Login</Text>
+            </TouchableOpacity>
+        </View>
     </Form>
+
   );
 };
 
+const styles = StyleSheet.create({
+    view: {
+        height: 50,
+        width: 350,
+        justifyContent: "center",
+        alignItems: "center",
+
+    },
+    text: {
+        color: "blue"
+
+    }
+});
 export default EmailFormComponent;

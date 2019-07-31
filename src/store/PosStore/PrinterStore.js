@@ -165,6 +165,8 @@ export const SyncInfo = types
   .model("SyncInfo", {
     _id: types.identifier(),
     url: types.optional(types.string, ""),
+    isHttps: types.optional(types.boolean, false),
+    isAutomatic: types.optional(types.boolean, false),
     user_name: types.optional(types.string, ""),
     password: types.optional(types.string, ""),
   })

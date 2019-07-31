@@ -6,9 +6,14 @@ import SplashScreen from "react-native-splash-screen";
 import { BluetoothStatus } from "react-native-bluetooth-status";
 import Pin from "@screens/Pin";
 import { currentLanguage } from "../../translations/CurrentLanguage";
+import BackgroundJob from "react-native-background-job";
+import { syncObjectValues } from "../../store/PosStore/syncInBackground";
+import config from "../../boot/configureStore";
 
 import translation from "../.././translations/translation";
 import LocalizedStrings from "react-native-localization";
+const stores2 = config();
+
 let strings = new LocalizedStrings(translation);
 @inject("attendantStore", "shiftStore", "receiptStore", "printerStore")
 @observer
@@ -22,6 +27,34 @@ export default class PinContainer extends React.Component {
   }
   componentWillMount() {
     this.getBluetoothState();
+      // NetInfo.isConnected.fetch().then(isConnected => {
+      //     if (isConnected) {
+      //         Alert.alert("You are online!");
+      //     } else {
+      //         Alert.alert("You are offline!");
+      //     }
+      // });
+
+      if (this.props.printerStore.sync[0].isAutomatic){
+          BackgroundJob.cancel({ jobKey: "AutomaticSync" });
+
+          const backgroundJob = {
+              jobKey: "myJob",
+              job: () => syncObjectValues("sync", stores2, true),
+          };
+          BackgroundJob.register(backgroundJob);
+          var backgroundSchedule = {
+              jobKey: "myJob",
+              period: 360000,
+              allowExecutionInForeground: true,
+              networkType: BackgroundJob.NETWORK_TYPE_UNMETERED,
+          };
+          BackgroundJob.schedule(backgroundSchedule);
+      } else {
+          BackgroundJob.cancel({ jobKey: "AutomaticSync" });
+          BackgroundJob.cancel({ jobKey: "myJob" });
+      }
+
   }
 
   async getBluetoothState() {

@@ -9,6 +9,7 @@ import Settings from "@screens/Settings";
 import { syncObjectValues } from "../../store/PosStore/syncInBackground";
 import { saveConfig } from "../../services/storage";
 import { currentLanguage } from "../../translations/CurrentLanguage";
+import BackgroundJob from "react-native-background-job";
 
 // import { syncData } from "./sync";
 import translation from "../../translations/translation";
@@ -124,8 +125,12 @@ export default class SettingsContainer extends React.Component {
         this.props.printerStore.companySettings[0].countryCode.toString(),
         "Settings",
       );
-    }
+      this.props.stateStore.changeCheckBox(
+          this.props.printerStore.sync[0].isHttps,
+          this.props.printerStore.sync[0].isAutomatic
+      );
 
+    }
     for (let i = 0; i < this.props.printerStore.rows.length; i += 1) {
       if (this.props.printerStore.rows[i].defaultPrinter) {
         // this.setState({
@@ -697,15 +702,37 @@ export default class SettingsContainer extends React.Component {
       sync.edit({
         _id: this.props.printerStore.sync[0]._id,
         url: this.props.stateStore.settings_state[0].url,
+        isHttps: this.props.stateStore.isHttps,
+        isAutomatic: this.props.stateStore.isAutomatic,
         user_name: this.props.stateStore.settings_state[0].user_name,
         password: this.props.stateStore.settings_state[0].password,
       });
     } else {
       this.props.printerStore.addSync({
         url: this.props.stateStore.settings_state[0].url,
+          isHttps: this.props.stateStore.isHttps,
+          isAutomatic: this.props.stateStore.isAutomatic,
         user_name: this.props.stateStore.settings_state[0].user_name,
         password: this.props.stateStore.settings_state[0].password,
       });
+    }
+    if (this.props.stateStore.isHttps){
+        const storeProps = this.props;
+        BackgroundJob.cancel({ jobKey: "AutomaticSync" });
+        const backgroundJob = {
+            jobKey: "myJob",
+            job: () => syncObjectValues("sync", storeProps, true),
+        };
+        BackgroundJob.register(backgroundJob);
+        var backgroundSchedule = {
+            jobKey: "myJob",
+            period: 360000,
+            allowExecutionInForeground: true,
+            networkType: BackgroundJob.NETWORK_TYPE_UNMETERED,
+        };
+        BackgroundJob.schedule(backgroundSchedule);
+    } else {
+        BackgroundJob.cancel({ jobKey: "myJob" });
     }
     saveConfig(this.props.stateStore);
     this.props.stateStore.changeValue("syncEditStatus", false, "Settings");
@@ -916,7 +943,9 @@ export default class SettingsContainer extends React.Component {
         // Sync Settings
         isSyncing={stateStore.isSyncing}
         isHttps={stateStore.isHttps}
+        isAutomatic={stateStore.isAutomatic}
         toggleHttps={stateStore.toggleHttps}
+        toggleAutomatic={stateStore.toggleAutomatic}
         deviceId={stateStore.deviceId}
         setDeviceId={stateStore.setDeviceId}
         isStackItem={stateStore.isStackItem}

@@ -39,6 +39,7 @@ const StateStore = types
     isEditingQueue: types.optional(types.boolean, false),
     useDescription: types.optional(types.boolean, false),
     isHttps: types.optional(types.boolean, false),
+    isAutomatic: types.optional(types.boolean, false),
     deviceId: types.optional(types.string, ""),
     isStackItem: types.optional(types.boolean, false),
 
@@ -185,11 +186,18 @@ const StateStore = types
     toggleHttps() {
       self.isHttps = !self.isHttps;
     },
+      toggleAutomatic() {
+      self.isAutomatic = !self.isAutomatic;
+    },
     setDeviceId(deviceId) {
       self.deviceId = deviceId;
     },
     toggleIsStackItem() {
       self.isStackItem = !self.isStackItem;
+    },
+      changeCheckBox(isHttps,isAutomatic) {
+      self.isHttps = isHttps;
+      self.isAutomatic = isAutomatic;
     },
   }));
 

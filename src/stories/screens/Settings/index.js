@@ -161,6 +161,8 @@ class Settings extends React.Component {
       companyLanguage,
       changeEditStatus,
       editStatus,
+        isAutomatic,
+        toggleAutomatic
     } = this.props;
 
     if (this.props.returnValue === strings.Bluetooth) {
@@ -189,8 +191,7 @@ class Settings extends React.Component {
         </View>
       );
     }
-
-    if (this.props.returnValue === strings.Company) {
+    if (this.props.returnValue === "Merchant") {
       return this.props.loading ? (
         <Spinner color="#427ec6" />
       ) : (
@@ -229,14 +230,16 @@ class Settings extends React.Component {
           user_name={user_name}
           password={password}
           isHttps={isHttps}
+          isAutomatic={isAutomatic}
           toggleIsHttps={toggleHttps}
+          toggleAutomatic={toggleAutomatic}
           deviceId={deviceId}
           setDeviceId={setDeviceId}
         />
       );
     }
 
-    if (this.props.returnValue === strings.Attendant) {
+    if (this.props.returnValue === "Employees") {
       if (attendant && attendant.role === "Owner") {
         return (
           <AddAttendant
@@ -291,8 +294,8 @@ class Settings extends React.Component {
     if (this.props.attendant && this.props.attendant.role === "Owner") {
       menuItems = [
         { name: strings.Bluetooth },
-        { name: strings.Company },
-        { name: strings.Attendant },
+        { name: "Merchant" },
+        { name: "Employees" },
         { name: strings.Sync },
         { name: strings.Queueing },
       ];

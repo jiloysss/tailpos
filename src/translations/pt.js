@@ -447,4 +447,6 @@ export default {
   AreYouSureYouWantToRestoreDefaultSettings:
     "Tem a certeza que quer restaurar as Configuraçãoes por Defeito?",
   DefaultSettingsRestored: "Restaurada Configurações por Defeito",
+    SelectEmployee: "Select Employee"
+
 };

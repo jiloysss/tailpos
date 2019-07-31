@@ -3,6 +3,7 @@ import { observer, inject } from "mobx-react/native";
 import { Toast } from "native-base";
 import SplashScreen from "react-native-splash-screen";
 import { currentLanguage } from "../../translations/CurrentLanguage";
+import { fetch_data_via_activation_key } from "../../store/SyncStore/ActivationKeySync";
 
 import Login from "@screens/Login";
 import translation from "../../translations/translation";
@@ -32,6 +33,10 @@ export default class LoginContainer extends React.Component {
       securityPinStatus: true,
       securityConfirmPinStatus: true,
       userName: "",
+      status: "Pin",
+      activationKey: "",
+      password: "",
+      url: ""
     };
   }
 
@@ -115,39 +120,37 @@ export default class LoginContainer extends React.Component {
   }
 
   onCodeInputClose() {
-    this.setState({ verificationVisible: false });
+    this.changeStateValues("verificationVisible",false);
   }
 
   registered() {
     this.props.loginForm.registered();
   }
 
+  changeStateValues = (key,value) => {
+      this.setState(this.changeValue(key,value));
+  }
+  changeValue = (key,value) => {
+      return {
+        [key]: value
+      };
+  }
+   onLogin = async () => {
+      await fetch_data_via_activation_key(this.state);
+  }
   render() {
+
     strings.setLanguage(currentLanguage().companyLanguage);
     return (
       <Login
+        values={this.state}
+        onLogin={this.onLogin}
         onSetPin={() => this.onSetPin()}
         onVerify={code => this.onVerify(code)}
         onResend={() => this.onResend()}
-        onNameChange={text => this.setState({ userName: text })}
-        onPinSecurityStatus={() =>
-          this.setState({ securityPinStatus: !this.state.securityPinStatus })
-        }
-        onConfirmPinSecurityStatus={() =>
-          this.setState({
-            securityConfirmPinStatus: !this.state.securityConfirmPinStatus,
-          })
-        }
-        onPinChange={text => this.setState({ pin: text })}
-        onConfirmPinChange={text => this.setState({ confirmPin: text })}
-        status={this.state.loginStatus}
         onCodeInputClose={() => this.onCodeInputClose()}
-        verificationVisible={this.state.verificationVisible}
-        userName={this.state.userName}
-        pin={this.state.pin}
-        confirmPin={this.state.confirmPin}
-        securityPinStatus={this.state.securityPinStatus}
-        securityConfirmPinStatus={this.state.securityConfirmPinStatus}
+        changeStateValues={(key,value) => this.changeStateValues(key,value)}
+
       />
     );
   }

@@ -2,7 +2,6 @@ import PouchDB from "pouchdb-react-native";
 import SQLite from "react-native-sqlite-2";
 import SQLiteAdapterFactory from "pouchdb-adapter-react-native-sqlite";
 import { getRoot } from "mobx-state-tree";
-import { unformat } from "accounting-js";
 import FrappeFetch from "react-native-frappe-fetch";
 import { Toast } from "native-base";
 var validUrl = require("valid-url");
@@ -17,18 +16,6 @@ export function openAndSyncDB(dbName, withSync = false) {
   return db;
 }
 
-export function syncDB(db, dbName, session) {
-  // Server URL
-  const url = `https://${session.db_name}:${session.token}@db.tailpos.com/${
-    session.db_name
-  }-${dbName}`;
-  const opts = { live: true, retry: true };
-
-  // Sync from
-  return db.replicate.from(url).on("complete", function(info) {
-    db.sync(url, opts);
-  });
-}
 export function sync(
   jsonObject,
   type,
@@ -89,30 +76,6 @@ export function sync(
   }
 }
 
-export function changeItemsStatusValue(table) {
-  table.allDocs({ include_docs: true }).then(entries => {
-    if (entries && entries.rows.length > 0) {
-      for (var i = 0; i < entries.rows.length; i++) {
-        if (entries.rows[i].doc.name) {
-          const entry = entries.rows[i].doc;
-          const objectValue = {
-            name: entry.name,
-            soldBy: entry.soldBy,
-            price: unformat(entry.price),
-            sku: entry.sku,
-            barcode: entry.barcode,
-            category: entry.category,
-            colorAndShape: JSON.stringify(entry.colorAndShape),
-            taxes: JSON.stringify(entry.taxes),
-            dateUpdated: entry.dateUpdated,
-            syncStatus: true,
-          };
-          editFields(entry, objectValue);
-        }
-      }
-    }
-  });
-}
 export function saveSnapshotToDB(db, snapshot) {
   let updateObj = false;
   db.upsert(snapshot._id, function(doc) {

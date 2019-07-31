@@ -18,21 +18,46 @@ class EditCheckBoxComponent extends React.PureComponent {
       onPress();
     }
   };
+    onPressAutomatic = () => {
+    const { disabled, onPressAutomatic } = this.props;
+    if (disabled) {
+      Toast.show({
+        text: strings.PleaseClickTheEditButton,
+        buttonText: "Okay",
+      });
+    } else {
+        onPressAutomatic();
+    }
+  };
 
   render() {
     strings.setLanguage(currentLanguage().companyLanguage);
 
-    const { checked, label, disabled } = this.props;
+    const { automaticLabel, checked, automaticChecked, label, disabled } = this.props;
     return (
-      <View style={styles.view}>
-        <CheckBox
-          checked={checked}
-          color={disabled ? "#cfcfcf" : "#ca94ff"}
-          style={styles.checkbox}
-          onPress={this.onPress}
-        />
-        <Text style={styles.text}>{label}</Text>
-      </View>
+        <View>
+          <View style={styles.view}>
+            <CheckBox
+              checked={checked}
+              color={disabled ? "#cfcfcf" : "#ca94ff"}
+              style={styles.checkbox}
+              onPress={this.onPress}
+            />
+            <Text style={styles.text}>{label}</Text>
+
+          </View>
+          <View style={styles.view1}>
+            <CheckBox
+              checked={automaticChecked}
+              color={disabled ? "#cfcfcf" : "#ca94ff"}
+              style={styles.checkbox}
+              onPress={this.onPressAutomatic}
+            />
+            <Text style={styles.text}>{automaticLabel}</Text>
+
+          </View>
+
+        </View>
     );
   }
 }
@@ -43,9 +68,18 @@ const styles = StyleSheet.create({
     paddingLeft: 17,
     paddingRight: 17,
   },
+    view1: {
+    flexDirection: "row",
+    paddingLeft: 17,
+    paddingRight: 17,
+    paddingTop: 17,
+  },
   checkbox: {
     left: 0,
   },
+    checkbox1: {
+        left: 10,
+    },
   text: {
     marginLeft: 10,
   },

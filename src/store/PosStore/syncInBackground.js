@@ -41,7 +41,7 @@ export function syncObjectValues(status, store, jobStatus) {
             const deleted = resultFromErpnext.deleted_documents;
 
             for (let x = 0; x < data.length; x++) {
-              const table = data[x].tableNames;
+              const table = data[x].table;
 
               if (table === "Categories") {
                 await categorySync(data[x], store);
@@ -230,7 +230,7 @@ export async function categorySync(categoryObject, store) {
     if (categoryObjectResult !== null) {
       categoryObjectResult.edit({
         _id: id,
-        name: description !== null ? description : "",
+        name: description || description !== null ? description : "",
         colorAndShape: JSON.stringify([
           {
             color: color !== null ? color.toLowerCase() : "gray",

@@ -33,7 +33,7 @@ class Pin extends React.Component {
             textAlign: "center",
           }}
         >
-          {strings.SelectAttendant}
+          {strings.SelectEmployee}
         </Text>
         <Picker
           note

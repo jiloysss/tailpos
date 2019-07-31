@@ -8,6 +8,7 @@ import { currentLanguage } from "../../../translations/CurrentLanguage";
 import styles from "./styles";
 
 import EmailFormComponent from "@components/EmailFormComponent";
+import AnotherWayToLoginComponent from "@components/AnotherWayToLoginComponent";
 import CodeInputComponent from "@components/CodeInputComponent";
 import translation from "../../../translations/translation";
 import LocalizedStrings from "react-native-localization";
@@ -15,23 +16,22 @@ let strings = new LocalizedStrings(translation);
 class Login extends React.Component {
   render() {
     const LoginComponent =
-      this.props.status === "idle" ? (
-        <EmailFormComponent
-          submitText="Set Pin"
-          onSubmit={() => this.props.onSetPin()}
-          onPinSecurityStatus={() => this.props.onPinSecurityStatus()}
-          onConfirmPinSecurityStatus={() =>
-            this.props.onConfirmPinSecurityStatus()
-          }
-          onNameChange={text => this.props.onNameChange(text)}
-          onPinChange={text => this.props.onPinChange(text)}
-          onConfirmPinChange={text => this.props.onConfirmPinChange(text)}
-          userName={this.props.userName}
-          pin={this.props.pin}
-          confirmPin={this.props.confirmPin}
-          securityPinStatus={this.props.securityPinStatus}
-          securityConfirmPinStatus={this.props.securityConfirmPinStatus}
-        />
+      this.props.values.loginStatus === "idle" ? (
+          this.props.values.status === "Pin" ? (
+              <EmailFormComponent
+                  submitText="Set Pin"
+                  onSubmit={() => this.props.onSetPin()}
+                  changeStateValues={(status,value)=>this.props.changeStateValues(status,value)}
+                  values={this.props.values}
+              />
+          ) : (
+              <AnotherWayToLoginComponent
+                  onLogin={this.props.onLogin}
+                  changeStateValues={(status,value)=>this.props.changeStateValues(status,value)}
+                  values={this.props.values}
+                  submitText="Login"
+              />
+              )
       ) : (
         <Spinner color="white" />
       );
@@ -39,7 +39,7 @@ class Login extends React.Component {
     return (
       <Container style={styles.container}>
         <CodeInputComponent
-          visible={this.props.verificationVisible}
+          visible={this.props.values.verificationVisible}
           onVerify={code => this.props.onVerify(code)}
           onResend={() => this.props.onResend()}
           onClose={() => this.props.onCodeInputClose()}
@@ -66,7 +66,11 @@ class Login extends React.Component {
                 textAlign: "center",
               }}
             >
-              {strings.SetOwnerPin}
+                {this.props.values.status === "Pin" ? (
+              strings.SetOwnerPin
+              ) : (
+                strings.Login
+                )}
             </Text>
             {LoginComponent}
           </View>
