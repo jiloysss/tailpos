@@ -31,11 +31,9 @@ export function automatic_sync_background_job(objects, props, sync_type) {
 }
 
 export async function find_record(obj, props) {
-  return await props.syncStore
-    .getObjects(obj, obj.table)
-    .then(result => {
-      return result[0];
-    });
+  return await props.syncStore.getObjects(obj, obj.table).then(result => {
+    return result[0];
+  });
 }
 export async function sync_now(obj, props, sync_type) {
   let get_object = await find_record(obj, props, sync_type);

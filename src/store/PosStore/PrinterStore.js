@@ -354,7 +354,6 @@ const Store = types
             });
           }
         } else {
-
           self.addCompany({
             name: "",
             header: "",
@@ -380,7 +379,6 @@ const Store = types
         }
       });
       dbd.allDocs(rowsOptions).then(entries => {
-
         if (entries && entries.rows.length > 0) {
           rowsOptions.startKey = entries.rows[entries.rows.length - 1].id;
           rowsOptions.skip = 1;

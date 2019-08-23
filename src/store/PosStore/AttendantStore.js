@@ -96,7 +96,6 @@ const AttendantStore = types
         return data._id === id;
       });
       if (obj) {
-
         return obj;
       } else {
         // await db.get(id).then(doc => {

@@ -266,7 +266,6 @@ export async function attendantSync(attendantObject, store) {
     attendantObject.id,
   );
   if (attendantObjectResult && attendantObject.role !== "None") {
-
     let attendantObjectFinal = {
       _id: attendantObject.id,
       user_name:
@@ -284,7 +283,6 @@ export async function attendantSync(attendantObject, store) {
       attendantObject.user_name,
     );
     if (!attendantObjectResult1) {
-
       let attendantObjectFinal = {
         _id: attendantObject.id !== null ? attendantObject.id : "",
         user_name:
@@ -422,7 +420,6 @@ export async function companySync(companyObject, store) {
       });
     }
   }
-
 }
 export async function changeSyncStatusValue(data, store) {
   let dataValue = JSON.parse(data);
