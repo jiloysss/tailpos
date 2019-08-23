@@ -9,7 +9,10 @@ import Settings from "@screens/Settings";
 import { syncObjectValues } from "../../store/PosStore/syncInBackground";
 import { saveConfig } from "../../services/storage";
 import { currentLanguage } from "../../translations/CurrentLanguage";
-import BackgroundJob from "react-native-background-job";
+
+const moment = require("moment");
+import { automatic_sync_background_job } from "../../store/SyncStore/SyncAutomatic";
+import { fetch_all_data } from "../../store/SyncStore/ActivationKeySync";
 
 // import { syncData } from "./sync";
 import translation from "../../translations/translation";
@@ -68,10 +71,10 @@ export default class SettingsContainer extends React.Component {
         "Settings",
       );
     }
-    if (this.props.attendantStore.rows.length > 0) {
-      this.setState({ attendants: this.props.attendantStore.rows.slice() });
-      // this.props.stateStore.changeValue("attendants", JSON.stringify(this.props.attendantStore.rows.slice()), "Settings")
-    }
+    // if (this.props.attendantStore.rows.length > 0) {
+    //   this.setState({ attendants: this.props.attendantStore.rows.slice() });
+    //   // this.props.stateStore.changeValue("attendants", JSON.stringify(this.props.attendantStore.rows.slice()), "Settings")
+    // }
     this.getBluetoothState();
     if (this.props.printerStore.bluetooth.length > 0) {
       // this.setState({
@@ -125,10 +128,16 @@ export default class SettingsContainer extends React.Component {
         this.props.printerStore.companySettings[0].countryCode.toString(),
         "Settings",
       );
-      this.props.stateStore.changeCheckBox(
-        this.props.printerStore.sync[0].isHttps,
-        this.props.printerStore.sync[0].isAutomatic,
-      );
+      if (this.props.printerStore.sync.length > 0) {
+        this.props.stateStore.changeCheckBox(
+          this.props.printerStore.sync[0].isHttps,
+          this.props.printerStore.sync[0].isAutomatic,
+          this.props.printerStore.sync[0].isErpnext,
+        );
+        this.props.stateStore.setDeviceLastSynced(
+          this.props.printerStore.sync[0].deviceLastSynced,
+        );
+      }
     }
     for (let i = 0; i < this.props.printerStore.rows.length; i += 1) {
       if (this.props.printerStore.rows[i].defaultPrinter) {
@@ -353,15 +362,16 @@ export default class SettingsContainer extends React.Component {
     }
   };
 
-  onCompanySave = () => {
+  onCompanySave = async () => {
     this.props.receiptStore.defaultReceipt.changeTaxes(
       this.props.stateStore.settings_state[0].tax,
     );
+
     if (this.props.printerStore.companySettings.length > 0) {
       let company = this.props.printerStore.findCompany(
         this.props.printerStore.companySettings[0]._id,
       );
-      company.edit({
+      let index = {
         _id: this.props.printerStore.companySettings[0]._id,
         tax: this.props.stateStore.settings_state[0].tax,
         name: this.props.stateStore.settings_state[0].companyName,
@@ -370,9 +380,16 @@ export default class SettingsContainer extends React.Component {
         header: this.props.stateStore.settings_state[0].companyHeader,
         footer: this.props.stateStore.settings_state[0].companyFooter,
         countryCode: this.props.stateStore.settings_state[0].companyCountry,
-      });
+        syncStatus: false,
+      };
+      company.edit(index);
+      if (this.props.printerStore.sync[0].isAutomatic) {
+        index.table = "Merchant";
+        await automatic_sync_background_job(index, this.props, "Create", true);
+        this.props.stateStore.setIsNotSyncing();
+      }
     } else {
-      this.props.printerStore.addCompany({
+      let index = {
         name: this.props.stateStore.settings_state[0].companyName,
         tax: this.props.stateStore.settings_state[0].tax,
         companyLanguage: this.props.stateStore.settings_state[0]
@@ -380,7 +397,16 @@ export default class SettingsContainer extends React.Component {
         header: this.props.stateStore.settings_state[0].companyHeader,
         footer: this.props.stateStore.settings_state[0].companyFooter,
         countryCode: this.props.stateStore.settings_state[0].companyCountry,
-      });
+        syncStatus: false,
+      };
+      this.props.printerStore.addCompany(index);
+      if (this.props.printerStore.sync[0].isAutomatic) {
+        index.table = "Merchant";
+        await automatic_sync_background_job(index, this.props, "Create", true);
+        this.setState({
+          loading: false,
+        });
+      }
     }
 
     if (
@@ -464,12 +490,12 @@ export default class SettingsContainer extends React.Component {
             if (!this.checkForSpecialChar(values.pin)) {
               if (values.confirmPin) {
                 if (values.pin === values.confirmPin) {
-                  if (values.status === "Save Attendant") {
+                  if (values.status === "Save Employee") {
                     this.props.attendantStore
                       .findAttendant(values.attendantName)
                       .then(result => {
                         if (!result) {
-                          this.props.attendantStore.add({
+                          let attendantObject = {
                             user_name: values.attendantName,
                             pin_code: values.pin,
                             role: values.role,
@@ -480,7 +506,16 @@ export default class SettingsContainer extends React.Component {
                                 : 0,
                             dateUpdated: Date.now(),
                             syncStatus: false,
-                          });
+                          };
+                          this.props.attendantStore.add(attendantObject);
+                          if (this.props.printerStore.sync[0].isAutomatic) {
+                            attendantObject.table = "Employee";
+                            automatic_sync_background_job(
+                              attendantObject,
+                              this.props,
+                              "Create",
+                            );
+                          }
                           Toast.show({
                             text: strings.SuccessfullyAddedAttendant,
                             duration: 5000,
@@ -500,12 +535,11 @@ export default class SettingsContainer extends React.Component {
 
                     // this.props.stateStore.changeValue("attendants", JSON.stringify(this.props.attendantStore.rows.slice()), "Settings")
                     // this.props.stateStore.changeValue("attendantsInfo",{}, "Settings")
-                  } else if (values.status === "Edit Attendant") {
+                  } else if (values.status === "Edit Employee") {
                     const valueAttendant = await this.props.attendantStore.find(
                       values.id,
                     );
-
-                    valueAttendant.edit({
+                    let attObject = {
                       _id: values.id,
                       user_name: values.attendantName,
                       pin_code: values.pin,
@@ -518,7 +552,16 @@ export default class SettingsContainer extends React.Component {
 
                       dateUpdated: Date.now(),
                       syncStatus: false,
-                    });
+                    };
+                    valueAttendant.edit(attObject);
+                    if (this.props.printerStore.sync[0].isAutomatic) {
+                      attObject.table = "Employee";
+                      automatic_sync_background_job(
+                        attObject,
+                        this.props,
+                        "Edit",
+                      );
+                    }
                     Toast.show({
                       text: strings.SuccessfullyUpdatedAttendant,
                       duration: 5000,
@@ -582,12 +625,12 @@ export default class SettingsContainer extends React.Component {
           // this.props.stateStore.changeValue("attendantsInfo",values, "Settings")
         }
       } else {
-        if (values.status === "Save Attendant") {
+        if (values.status === "Save Employee") {
           this.props.attendantStore
             .findAttendant(values.attendantName)
             .then(result => {
               if (!result) {
-                this.props.attendantStore.add({
+                let attendantObject = {
                   user_name: values.attendantName,
                   pin_code: values.pin,
                   role: values.role,
@@ -598,7 +641,17 @@ export default class SettingsContainer extends React.Component {
                       : 0,
                   dateUpdated: Date.now(),
                   syncStatus: false,
-                });
+                };
+                this.props.attendantStore.add(attendantObject);
+                if (this.props.printerStore.sync[0].isAutomatic) {
+                  attendantObject.table = "Employee";
+
+                  automatic_sync_background_job(
+                    attendantObject,
+                    this.props,
+                    "Create",
+                  );
+                }
                 Toast.show({
                   text: strings.SuccessfullyAddedAttendant,
                   duration: 5000,
@@ -618,12 +671,11 @@ export default class SettingsContainer extends React.Component {
 
           // this.props.stateStore.changeValue("attendants", JSON.stringify(this.props.attendantStore.rows.slice()), "Settings")
           // this.props.stateStore.changeValue("attendantsInfo",{}, "Settings")
-        } else if (values.status === "Edit Attendant") {
+        } else if (values.status === "Edit Employee") {
           const valueAttendant = await this.props.attendantStore.find(
             values.id,
           );
-
-          valueAttendant.edit({
+          let attendantObject = {
             _id: values.id,
             user_name: values.attendantName,
             pin_code: values.pin,
@@ -636,7 +688,12 @@ export default class SettingsContainer extends React.Component {
 
             dateUpdated: Date.now(),
             syncStatus: false,
-          });
+          };
+          valueAttendant.edit(attendantObject);
+          if (this.props.printerStore.sync[0].isAutomatic) {
+            attendantObject.table = "Employee";
+            automatic_sync_background_job(attendantObject, this.props, "Edit");
+          }
           Toast.show({
             text: strings.SuccessfullyUpdatedAttendant,
             duration: 5000,
@@ -662,10 +719,15 @@ export default class SettingsContainer extends React.Component {
     }
   };
   async deleteAttendant(index) {
-    index.delete();
-    this.setState({
-      attendants: this.props.attendantStore.rows.slice(),
-    });
+    if (this.props.printerStore.sync[0].isAutomatic) {
+      index.table = "Employee";
+      automatic_sync_background_job(index, this.props, "Delete", true);
+    } else {
+      index.delete();
+      this.setState({
+        attendants: this.props.attendantStore.rows.slice(),
+      });
+    }
   }
   onDeleteAttendant = index => {
     Alert.alert(
@@ -677,10 +739,12 @@ export default class SettingsContainer extends React.Component {
           text: strings.OK,
           onPress: () => {
             this.deleteAttendant(index);
-            Toast.show({
-              text: strings.SuccessfullyDeletedAttendant,
-              duration: 5000,
-            });
+            if (!this.props.printerStore.sync[0].isAutomatic) {
+              Toast.show({
+                text: strings.SuccessfullyDeletedAttendant,
+                duration: 5000,
+              });
+            }
           },
         },
       ],
@@ -689,8 +753,17 @@ export default class SettingsContainer extends React.Component {
 
   syncAll = status => {
     const storeProps = this.props;
+    const { stateStore, printerStore } = this.props;
     this.props.stateStore.setIsSyncing();
-    syncObjectValues(status, storeProps, false);
+    if (stateStore.isErpnext) {
+      syncObjectValues(status, storeProps, false);
+    } else {
+      if (printerStore.companySettings.length > 0) {
+        printerStore.sync[0].merchant_id =
+          printerStore.companySettings[0].merchant_id;
+      }
+      fetch_all_data(printerStore.sync[0], this.props);
+    }
   };
 
   onSyncSave = () => {
@@ -703,48 +776,38 @@ export default class SettingsContainer extends React.Component {
         url: this.props.stateStore.settings_state[0].url,
         isHttps: this.props.stateStore.isHttps,
         isAutomatic: this.props.stateStore.isAutomatic,
+        isErpnext: this.props.stateStore.isErpnext,
         user_name: this.props.stateStore.settings_state[0].user_name,
         password: this.props.stateStore.settings_state[0].password,
+        deviceLastSynced: this.props.stateStore.deviceLastSynced,
       });
     } else {
       this.props.printerStore.addSync({
         url: this.props.stateStore.settings_state[0].url,
         isHttps: this.props.stateStore.isHttps,
         isAutomatic: this.props.stateStore.isAutomatic,
+        isErpnext: this.props.stateStore.isErpnext,
         user_name: this.props.stateStore.settings_state[0].user_name,
-        password: this.props.stateStore.settings_state[0].password,
+        deviceLastSynced: moment().format("YYYY/MM/D hh:mm:ss SSS"),
       });
-    }
-    if (this.props.stateStore.isHttps) {
-      const storeProps = this.props;
-      BackgroundJob.cancel({ jobKey: "AutomaticSync" });
-      const backgroundJob = {
-        jobKey: "myJob",
-        job: () => syncObjectValues("sync", storeProps, true),
-      };
-      BackgroundJob.register(backgroundJob);
-      var backgroundSchedule = {
-        jobKey: "myJob",
-        period: 360000,
-        allowExecutionInForeground: true,
-        networkType: BackgroundJob.NETWORK_TYPE_UNMETERED,
-      };
-      BackgroundJob.schedule(backgroundSchedule);
-    } else {
-      BackgroundJob.cancel({ jobKey: "myJob" });
     }
     saveConfig(this.props.stateStore);
     this.props.stateStore.changeValue("syncEditStatus", false, "Settings");
   };
 
-  onAddRoles(values) {
+  async onAddRoles(values) {
     if (values.role) {
-      this.props.roleStore.add({
+      let roleObject = {
         role: values.role,
         dateUpdated: Date.now(),
         syncStatus: false,
         canLogin: values.checkBoxValue,
-      });
+      };
+      await this.props.roleStore.add(roleObject);
+      if (this.props.printerStore.sync[0].isAutomatic) {
+        roleObject.table = "Role";
+        automatic_sync_background_job(roleObject, this.props, "Create");
+      }
       Toast.show({
         text: strings.SuccessfullyAddedRole,
         duration: 3000,
@@ -766,11 +829,16 @@ export default class SettingsContainer extends React.Component {
         {
           text: strings.OK,
           onPress: () => {
-            values.delete();
-            Toast.show({
-              text: strings.SuccessfullyDeletedRole,
-              duration: 5000,
-            });
+            if (this.props.printerStore.sync[0].isAutomatic) {
+              values.table = "Role";
+              automatic_sync_background_job(values, this.props, "Delete", true);
+            } else {
+              values.delete();
+              Toast.show({
+                text: strings.SuccessfullyDeletedRole,
+                duration: 5000,
+              });
+            }
           },
         },
       ],
@@ -843,13 +911,22 @@ export default class SettingsContainer extends React.Component {
       printerStore,
       navigation,
     } = this.props;
-
     return (
       <Settings
         loading={this.state.loading}
         changeReturnValue={text => this.setState({ returnValue: text })}
         returnValue={this.state.returnValue}
         navigation={navigation}
+        activationKey={
+          printerStore.companySettings.length > 0
+            ? printerStore.companySettings[0].activationKey
+            : ""
+        }
+        merchant_id={
+          printerStore.companySettings.length > 0
+            ? printerStore.companySettings[0].merchant_id
+            : ""
+        }
         values={stateStore.settings_state[0].toJSON()}
         connected={stateStore.settings_state[0].connected}
         checkBoxValue={stateStore.settings_state[0].checkBoxValue}
@@ -885,7 +962,11 @@ export default class SettingsContainer extends React.Component {
           stateStore.changeValue("companyFooter", text, "Settings")
         }
         attendantForm={this.attendantForm}
-        attendantsData={this.state.attendants}
+        attendantsData={
+          this.props.attendantStore.rows.length > 0
+            ? this.props.attendantStore.rows.slice()
+            : []
+        }
         onClickAttendant={attendant =>
           this.setState({ attendantsInfo: attendant })
         }
@@ -943,8 +1024,11 @@ export default class SettingsContainer extends React.Component {
         isSyncing={stateStore.isSyncing}
         isHttps={stateStore.isHttps}
         isAutomatic={stateStore.isAutomatic}
+        isErpnext={stateStore.isErpnext}
+        deviceLastSynced={stateStore.deviceLastSynced}
         toggleHttps={stateStore.toggleHttps}
         toggleAutomatic={stateStore.toggleAutomatic}
+        toggleErpnext={stateStore.toggleErpnext}
         deviceId={stateStore.deviceId}
         setDeviceId={stateStore.setDeviceId}
         isStackItem={stateStore.isStackItem}

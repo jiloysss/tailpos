@@ -3,6 +3,8 @@ import { Toast } from "native-base";
 import { observer, inject } from "mobx-react/native";
 import BluetoothSerial from "react-native-bluetooth-serial";
 import TinyPOS from "tiny-esc-pos";
+import { automatic_sync_background_job } from "../../store/SyncStore/SyncAutomatic";
+
 const moment = require("moment");
 import { currentLanguage } from "../../translations/CurrentLanguage";
 
@@ -10,7 +12,13 @@ import ShiftScreen from "@screens/Shift";
 import translation from "../../translations/translation";
 import LocalizedStrings from "react-native-localization";
 let strings = new LocalizedStrings(translation);
-@inject("shiftStore", "attendantStore", "shiftReportsStore", "printerStore")
+@inject(
+  "shiftStore",
+  "attendantStore",
+  "shiftReportsStore",
+  "printerStore",
+  "syncStore",
+)
 @observer
 export default class ShiftContainer extends React.Component {
   constructor(props) {
@@ -56,6 +64,9 @@ export default class ShiftContainer extends React.Component {
   closeShift = money => {
     if (money) {
       const { defaultShift } = this.props.shiftStore;
+      let shiftDefault = defaultShift;
+      shiftDefault.table = "Shift";
+      automatic_sync_background_job(shiftDefault, this.props, "Create");
       defaultShift.closeShift(money);
     } else {
       Toast.show({

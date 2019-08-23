@@ -209,8 +209,10 @@ export default {
   GenerateZReading: "Generate Z Reading",
   NoZReadingGenerated: "No Z Reading Generated",
   ZReading: "Z Reading",
+  ZReadin: "Z Reading",
   Opened: "Opened",
   By: "by",
+  by: "by",
   TotalNetSales: "Total Net Sales",
   Transactions: "Transactions",
   OpeningAmount: "Opening Amount",
@@ -260,7 +262,7 @@ export default {
 
   //Attendant
   AddRole: "Add Role",
-  AttendantName: "Attendant Name",
+  AttendantName: "Employee Name",
   CanLogin: "Can Login",
   SaveAttendant: "Save Attendant",
   Pin: "Pin",
@@ -276,7 +278,7 @@ export default {
   Password: "Password",
   DeviceID: "Device ID",
   PleaseClickTheEditButton: "Please click the edit (pencil icon) button",
-  EnterValidAttendantName: "Enter Valid Attendant Name",
+  EnterValidAttendantName: "Enter Valid Employee Name",
   //Queueing
   OtherSettings: "Other Settings",
   UseDescription: "Use Description",
@@ -450,4 +452,6 @@ export default {
   DefaultSettingsRestored: "Default Settings Restored",
 
   SelectEmployee: "Select Employee",
+  ActivationKey: "Activation Key",
+  MerchantID: "Merchant ID",
 };

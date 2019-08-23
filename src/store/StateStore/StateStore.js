@@ -40,6 +40,8 @@ const StateStore = types
     useDescription: types.optional(types.boolean, false),
     isHttps: types.optional(types.boolean, false),
     isAutomatic: types.optional(types.boolean, false),
+    isErpnext: types.optional(types.boolean, false),
+    deviceLastSynced: types.optional(types.string, ""),
     deviceId: types.optional(types.string, ""),
     isStackItem: types.optional(types.boolean, false),
 
@@ -189,15 +191,22 @@ const StateStore = types
     toggleAutomatic() {
       self.isAutomatic = !self.isAutomatic;
     },
+    toggleErpnext() {
+      self.isErpnext = !self.isErpnext;
+    },
     setDeviceId(deviceId) {
       self.deviceId = deviceId;
+    },
+    setDeviceLastSynced(deviceLastSynced) {
+      self.deviceLastSynced = deviceLastSynced;
     },
     toggleIsStackItem() {
       self.isStackItem = !self.isStackItem;
     },
-    changeCheckBox(isHttps, isAutomatic) {
+    changeCheckBox(isHttps, isAutomatic, isErpnext) {
       self.isHttps = isHttps;
       self.isAutomatic = isAutomatic;
+      self.isErpnext = isErpnext;
     },
   }));
 

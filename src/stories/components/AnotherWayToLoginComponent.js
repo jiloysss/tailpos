@@ -1,6 +1,13 @@
 import * as React from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
-import { Form, Item, Input, Button, Text } from "native-base";
+import {
+  Form,
+  Item,
+  Input,
+  Button,
+  Text,
+  Spinner,
+} from "native-base";
 import { currentLanguage } from "../../translations/CurrentLanguage";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -10,21 +17,20 @@ let strings = new LocalizedStrings(translation);
 // TODO: styles based from props
 const AnotherWayToLogin = props => {
   strings.setLanguage(currentLanguage().companyLanguage);
-
   return (
     <Form style={{ width: 350 }}>
-      <Item
-        regular
-        // error={props.emailError}
-        style={{ backgroundColor: "white" }}
-      >
-        <Icon active name="key" size={30} />
-        <Input
-          placeholder="Site Url"
-          value={props.values.url}
-          onChangeText={text => props.changeStateValues("url", text)}
-        />
-      </Item>
+      {/*<Item*/}
+      {/*regular*/}
+      {/*// error={props.emailError}*/}
+      {/*style={{ backgroundColor: "white" }}*/}
+      {/*>*/}
+      {/*<Icon active name="key" size={30} />*/}
+      {/*<Input*/}
+      {/*placeholder="Site Url"*/}
+      {/*value={props.values.url}*/}
+      {/*onChangeText={text => props.changeStateValues("url", text)}*/}
+      {/*/>*/}
+      {/*</Item>*/}
       <Item
         regular
         // error={props.emailError}
@@ -61,20 +67,37 @@ const AnotherWayToLogin = props => {
           }
         />
       </Item>
-      <Button
-        block
-        onPress={props.onLogin}
-        style={{ backgroundColor: "#427ec6" }}
-      >
-        <Text>{props.submitText}</Text>
-      </Button>
-      <View style={styles.view}>
-        <TouchableOpacity
-          onPress={() => props.changeStateValues("status", "Pin")}
+      {props.syncStatus ? (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
-          <Text style={styles.text}>Set Owners Pin</Text>
-        </TouchableOpacity>
-      </View>
+          <Spinner color="red" />
+          <View style={{ marginLeft: 10 }}>
+            <Text style={{ fontSize: 20 }}>Syncing...</Text>
+          </View>
+        </View>
+      ) : (
+        <View>
+          <Button
+            block
+            onPress={props.onLogin}
+            style={{ backgroundColor: "#427ec6" }}
+          >
+            <Text>{props.submitText}</Text>
+          </Button>
+          <View style={styles.view}>
+            <TouchableOpacity
+              onPress={() => props.changeStateValues("status", "Pin")}
+            >
+              <Text style={styles.text}>Set Owners Pin</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </Form>
   );
 };

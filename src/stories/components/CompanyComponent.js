@@ -113,6 +113,24 @@ class CompanyComponent extends React.PureComponent {
               </View>
             </View>
           </CardItem>
+          {this.props.activationKey ? (
+            <EditInput
+              // secure={false}
+              disabled={true}
+              value={this.props.activationKey}
+              placeholder="Activation Key"
+              label={strings.ActivationKey}
+            />
+          ) : null}
+          {this.props.merchant_id ? (
+            <EditInput
+              // secure={false}
+              disabled={true}
+              value={this.props.merchant_id}
+              placeholder="Merchant ID"
+              label={strings.MerchantID}
+            />
+          ) : null}
           <EditInput
             secure={false}
             disabled={!this.props.editStatus}

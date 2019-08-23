@@ -17,23 +17,36 @@ class CompanyComponent extends React.PureComponent {
   onSyncEdit = () => this.props.onSyncEdit(true);
 
   renderSyncButtons() {
-    const { url, user_name, password } = this.props;
+    const { isErpnext } = this.props;
 
     let component = null;
 
-    if (url && user_name && password) {
-      component = (
-        <View style={styles.view}>
-          <Button onPress={this.onSync}>
-            <Text>{strings.Sync}</Text>
+    // if (url && user_name && password) {
+    component = (
+      <View style={styles.view}>
+        <Button
+          block
+          style={{ width: isErpnext ? "35%" : "50%" }}
+          onPress={this.onSync}
+        >
+          <Text style={{ flexWrap: "wrap", textAlign: "center" }}>
+            {strings.Sync}
+          </Text>
+        </Button>
+        {isErpnext ? (
+          <Button
+            block
+            style={{ marginLeft: 10, width: "35%" }}
+            onPress={this.onForceSync}
+          >
+            <Text style={{ flexWrap: "wrap", textAlign: "center" }}>
+              {strings.ForceSync}
+            </Text>
           </Button>
-          <Button style={styles.lastButton} onPress={this.onForceSync}>
-            <Text>{strings.ForceSync}</Text>
-          </Button>
-        </View>
-      );
-    }
-
+        ) : null}
+      </View>
+    );
+    // }
     return component;
   }
 
@@ -54,6 +67,9 @@ class CompanyComponent extends React.PureComponent {
       deviceId,
       toggleAutomatic,
       isAutomatic,
+      isErpnext,
+      toggleErpnext,
+      deviceLastSynced,
     } = this.props;
     strings.setLanguage(currentLanguage().companyLanguage);
 
@@ -90,22 +106,26 @@ class CompanyComponent extends React.PureComponent {
             </Grid>
           </CardItem>
           {SyncStatus}
+
           <EditInput
             secure={false}
             value={url}
             disabled={!syncEditStatus}
             onChange={changeUrl}
             placeholder="erpnext.com"
-            label={"ERPNext " + strings.Server}
+            label={strings.Server}
           />
 
           <EditCheckBox
             label="Is HTTPs"
-            automaticLabel="Automatic Sync - (It will sync every 6 min)"
+            automaticLabel="Automatic Sync"
+            erpnextLabel="is ERPNext"
             checked={isHttps}
             automaticChecked={isAutomatic}
+            isErpnext={isErpnext}
             onPress={toggleIsHttps}
             onPressAutomatic={toggleAutomatic}
+            onPressErpnext={toggleErpnext}
             disabled={!syncEditStatus}
           />
           <EditInput
@@ -131,6 +151,11 @@ class CompanyComponent extends React.PureComponent {
             onChange={setDeviceId}
             placeholder="xxxxxxxx"
             label={strings.DeviceID}
+          />
+          <EditInput
+            disabled={true}
+            value={deviceLastSynced}
+            label="Device Last Synced"
           />
           <CardItem>{this.renderSyncButtons()}</CardItem>
         </Card>
@@ -163,8 +188,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   lastButton: {
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: 10,
   },
+
   viewRight: {
     flexDirection: "row",
     alignSelf: "flex-end",

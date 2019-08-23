@@ -7,6 +7,7 @@ import { formatNumber } from "accounting-js";
 import { inject, observer } from "mobx-react/native";
 import ReceiptInfo from "@screens/ReceiptInfo";
 import { currentLanguage } from "../../translations/CurrentLanguage";
+import { automatic_sync_background_job } from "../../store/SyncStore/SyncAutomatic";
 
 import translation from "../../translations/translation";
 import LocalizedStrings from "react-native-localization";
@@ -19,6 +20,7 @@ const moment = require("moment");
   "itemStore",
   "shiftStore",
   "attendantStore",
+  "syncStore",
 )
 @observer
 export default class ReceiptInfoContainer extends React.Component {
@@ -475,35 +477,6 @@ export default class ReceiptInfoContainer extends React.Component {
             ),
           ),
         );
-        writePromises.push(
-          BluetoothSerial.write(
-            TinyPOS.bufferedText(
-              "\n" +
-                strings.POSProvider +
-                "Bai Web and Mobile Lab\n" +
-                "Insular Life Bldg, Don Apolinar\n" +
-                "Velez cor. Oldarico Akut St.,\n" +
-                "Cagayan de Oro, 9000,\n" +
-                "Misamis Oriental\n" +
-                strings.AccredNo +
-                strings.DateIssued +
-                strings.ValidUntil,
-              { align: "left", size: "normal" },
-              true,
-            ),
-          ),
-        );
-        writePromises.push(
-          BluetoothSerial.write(
-            TinyPOS.bufferedText(
-              strings.ThisReceiptShallBeValidFor +
-                strings.FiveYearsFromTheDateOf +
-                strings.ThePermitToUse,
-              { align: "center", size: "normal" },
-              true,
-            ),
-          ),
-        );
 
         // Add 3 new lines
         writePromises.push(BluetoothSerial.write(TinyPOS.bufferedLine(3)));
@@ -550,13 +523,15 @@ export default class ReceiptInfoContainer extends React.Component {
 
   onReceiptCancel(obj) {
     const { paymentReceipt } = this.props.paymentStore;
-
     // payment receipt
     if (this.state.reasonValue) {
       paymentReceipt.changeReason(this.state.reasonValue);
       paymentReceipt.cancelled(paymentReceipt);
       this.props.shiftStore.setNewValues(obj);
-
+      if (this.props.printerStore.sync[0].isAutomatic) {
+        paymentReceipt.table = "Receipt";
+        automatic_sync_background_job(paymentReceipt, this.props, "Edit");
+      }
       // Navigate to payment store
       this.props.navigation.navigate("Receipts");
     } else {

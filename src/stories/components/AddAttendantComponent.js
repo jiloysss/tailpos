@@ -15,7 +15,7 @@ let strings = new LocalizedStrings(translation);
 class AddAttendantComponent extends React.PureComponent {
   onChangeStatus = () => {
     const { onChangeRoleStatus, roleStatus } = this.props;
-    onChangeRoleStatus(roleStatus === "Role" ? "Attendant" : "Role");
+    onChangeRoleStatus(roleStatus === "Role" ? "Employee" : "Role");
   };
 
   renderAttendant() {

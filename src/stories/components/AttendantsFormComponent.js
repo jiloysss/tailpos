@@ -27,7 +27,7 @@ class AddAttendantComponent extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { attendantInfo } = nextProps;
     if (attendantInfo._id) {
-      this.setState({ status: "Edit Attendant" });
+      this.setState({ status: "Edit Employee" });
     }
     if (attendantInfo.user_name || attendantInfo.attendantName) {
       this.setState({
@@ -69,7 +69,7 @@ class AddAttendantComponent extends React.Component {
         confirmPin: "",
         securityPinStatus: true,
         securityConfirmPinStatus: true,
-        status: "Save Attendant",
+        status: "Save Employee",
         role: "Owner",
         canLogin: false,
         commission: "",
@@ -116,10 +116,10 @@ class AddAttendantComponent extends React.Component {
     const { status } = this.state;
     const { onSave, onEdit } = this.props;
 
-    if (status === "Save Attendant") {
+    if (status === "Save Employee") {
       onSave(this.state);
     }
-    if (status === "Edit Attendant") {
+    if (status === "Edit Employee") {
       onEdit(this.state);
     }
   };
@@ -202,7 +202,7 @@ class AddAttendantComponent extends React.Component {
 
     const { rolesData } = this.props;
     const { attendantName, role, canLogin } = this.state;
-
+    rolesData.push({ role: "None" });
     const Roles = rolesData.map(this.renderRoles);
 
     return (

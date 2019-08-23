@@ -75,6 +75,9 @@ export const Company = types
     companyLanguage: types.string,
     tax: types.optional(types.string, "0"),
     countryCode: types.optional(types.string, "PHP"),
+    activationKey: types.optional(types.string, ""),
+    merchant_id: types.optional(types.string, ""),
+    syncStatus: types.optional(types.boolean, false),
   })
   .preProcessSnapshot(snapshot => assignUUID(snapshot, "Company"))
   .actions(self => ({
@@ -167,8 +170,11 @@ export const SyncInfo = types
     url: types.optional(types.string, ""),
     isHttps: types.optional(types.boolean, false),
     isAutomatic: types.optional(types.boolean, false),
+    isErpnext: types.optional(types.boolean, false),
     user_name: types.optional(types.string, ""),
     password: types.optional(types.string, ""),
+    deviceLastSynced: types.optional(types.string, ""),
+    token: types.optional(types.string, ""),
   })
   .preProcessSnapshot(snapshot => assignUUID(snapshot, "SyncInfo"))
   .actions(self => ({
@@ -332,6 +338,7 @@ const Store = types
               if (!entries.rows[i].doc.companyLanguage) {
                 entries.rows[i].doc.companyLanguage = "en";
               }
+
               self.addCompany(JSON.parse(JSON.stringify(entries.rows[i].doc)));
             }
           }
@@ -343,9 +350,11 @@ const Store = types
               companyLanguage: "en",
               tax: "0",
               countryCode: "PHP",
+              activationKey: "",
             });
           }
         } else {
+
           self.addCompany({
             name: "",
             header: "",
@@ -353,6 +362,7 @@ const Store = types
             footer: "",
             tax: "0",
             countryCode: "PHP",
+            activationKey: "",
           });
         }
       });
@@ -370,6 +380,7 @@ const Store = types
         }
       });
       dbd.allDocs(rowsOptions).then(entries => {
+
         if (entries && entries.rows.length > 0) {
           rowsOptions.startKey = entries.rows[entries.rows.length - 1].id;
           rowsOptions.skip = 1;

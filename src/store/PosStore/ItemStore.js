@@ -193,7 +193,7 @@ const Store = types
     setDuplicateBarcodeObject(values) {
       self.duplicateBarcodeObject = values;
     },
-    find(id) {
+    async find(id) {
       let obj = self.rows.find(data => {
         return data._id === id;
       });
@@ -207,7 +207,7 @@ const Store = types
         //       return null;
         //   }
         // });
-        db
+        await db
           .find({
             selector: {
               _id: { $regex: `.*${id}.*` },

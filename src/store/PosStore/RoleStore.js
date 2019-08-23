@@ -75,6 +75,24 @@ const Store = types
       }
       return null;
     },
+    findRole(role) {
+      return new Promise(function(resolve, reject) {
+        openAndSyncDB("roles", true)
+          .find({
+            selector: {
+              role: { $regex: role },
+            },
+          })
+          .then(result => {
+            const categoryItemsReplacement = result.docs.map(item =>
+              JSON.parse(JSON.stringify(item)),
+            );
+            if (categoryItemsReplacement) {
+              resolve(categoryItemsReplacement);
+            }
+          });
+      });
+    },
     setRole(obj) {
       self.roleSelected = obj;
     },

@@ -12,13 +12,22 @@ let strings = new LocalizedStrings(translation);
 class Pin extends React.Component {
   render() {
     strings.setLanguage(currentLanguage().companyLanguage);
-    const Attendants = this.props.attendants.map((value, index) => (
-      <Picker.Item
-        key={index}
-        value={value._id}
-        label={`${value.user_name} [${value.role}]`}
-      />
-    ));
+    const Attendants = this.props.attendants.map(
+      (value, index) =>
+        value.role !== "None" ? (
+          <Picker.Item
+            key={index}
+            value={value._id}
+            label={`${value.user_name} [${value.role}]`}
+          />
+        ) : (
+          <Picker.Item
+            key={index}
+            value={value._id}
+            label={`${value.user_name}`}
+          />
+        ),
+    );
     const AttendantPicker = (
       <View style={{ alignItems: "center" }}>
         <Image

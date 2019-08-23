@@ -163,6 +163,11 @@ class Settings extends React.Component {
       editStatus,
       isAutomatic,
       toggleAutomatic,
+      isErpnext,
+      toggleErpnext,
+      deviceLastSynced,
+      activationKey,
+      merchant_id,
     } = this.props;
 
     if (this.props.returnValue === strings.Bluetooth) {
@@ -196,6 +201,8 @@ class Settings extends React.Component {
         <Spinner color="#427ec6" />
       ) : (
         <CompanySettings
+          activationKey={activationKey}
+          merchant_id={merchant_id}
           values={values}
           changeName={changeName}
           changeTax={changeTax}
@@ -231,10 +238,13 @@ class Settings extends React.Component {
           password={password}
           isHttps={isHttps}
           isAutomatic={isAutomatic}
+          isErpnext={isErpnext}
           toggleIsHttps={toggleHttps}
           toggleAutomatic={toggleAutomatic}
+          toggleErpnext={toggleErpnext}
           deviceId={deviceId}
           setDeviceId={setDeviceId}
+          deviceLastSynced={deviceLastSynced}
         />
       );
     }

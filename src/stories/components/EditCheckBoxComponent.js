@@ -29,6 +29,17 @@ class EditCheckBoxComponent extends React.PureComponent {
       onPressAutomatic();
     }
   };
+  onPressErpnext = () => {
+    const { disabled, onPressErpnext } = this.props;
+    if (disabled) {
+      Toast.show({
+        text: strings.PleaseClickTheEditButton,
+        buttonText: "Okay",
+      });
+    } else {
+      onPressErpnext();
+    }
+  };
 
   render() {
     strings.setLanguage(currentLanguage().companyLanguage);
@@ -39,7 +50,10 @@ class EditCheckBoxComponent extends React.PureComponent {
       automaticChecked,
       label,
       disabled,
+      erpnextLabel,
+      isErpnext,
     } = this.props;
+
     return (
       <View>
         <View style={styles.view}>
@@ -59,6 +73,15 @@ class EditCheckBoxComponent extends React.PureComponent {
             onPress={this.onPressAutomatic}
           />
           <Text style={styles.text}>{automaticLabel}</Text>
+        </View>
+        <View style={styles.view1}>
+          <CheckBox
+            checked={isErpnext}
+            color={disabled ? "#cfcfcf" : "#ca94ff"}
+            style={styles.checkbox}
+            onPress={this.onPressErpnext}
+          />
+          <Text style={styles.text}>{erpnextLabel}</Text>
         </View>
       </View>
     );

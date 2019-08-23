@@ -8,6 +8,7 @@ import { fetch_data_via_activation_key } from "../../store/SyncStore/ActivationK
 import Login from "@screens/Login";
 import translation from "../../translations/translation";
 import LocalizedStrings from "react-native-localization";
+
 let strings = new LocalizedStrings(translation);
 @inject(
   "loginForm",
@@ -20,6 +21,9 @@ let strings = new LocalizedStrings(translation);
   "receiptStore",
   "paymentStore",
   "roleStore",
+  "stateStore",
+  "syncStore",
+  "printerStore",
 )
 @observer
 export default class LoginContainer extends React.Component {
@@ -136,12 +140,46 @@ export default class LoginContainer extends React.Component {
     };
   };
   onLogin = async () => {
-    await fetch_data_via_activation_key(this.state);
+    if (this.state.activationKey) {
+      if (this.state.password) {
+        this.props.stateStore.setIsSyncing();
+        await fetch_data_via_activation_key(this.state, this.props).then(
+          result => {
+            if (result === "Success") {
+              this.props.navigation.navigate("Loading", { isLogin: true });
+            } else {
+              this.props.stateStore.setIsNotSyncing();
+              Toast.show({
+                text: result ? result.message : "Unable to sync",
+                buttonText: strings.Okay,
+                type: "danger",
+                duration: 5000,
+              });
+            }
+          },
+        );
+      } else {
+        Toast.show({
+          text: "Invalid Password",
+          buttonText: strings.Okay,
+          type: "danger",
+          duration: 5000,
+        });
+      }
+    } else {
+      Toast.show({
+        text: "Invalid Activation key",
+        buttonText: strings.Okay,
+        type: "danger",
+        duration: 5000,
+      });
+    }
   };
   render() {
     strings.setLanguage(currentLanguage().companyLanguage);
     return (
       <Login
+        syncStatus={this.props.stateStore.isSyncing}
         values={this.state}
         onLogin={this.onLogin}
         onSetPin={() => this.onSetPin()}

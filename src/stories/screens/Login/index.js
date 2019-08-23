@@ -28,6 +28,7 @@ class Login extends React.Component {
           />
         ) : (
           <AnotherWayToLoginComponent
+            syncStatus={this.props.syncStatus}
             onLogin={this.props.onLogin}
             changeStateValues={(status, value) =>
               this.props.changeStateValues(status, value)

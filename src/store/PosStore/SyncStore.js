@@ -115,6 +115,8 @@ const SyncStore = types
         "payments",
         "shifts",
         "customers",
+        "company",
+        "roles",
       ];
       let databaseNamesUpperCase = [
         "Categories",
@@ -125,6 +127,8 @@ const SyncStore = types
         "Payments",
         "Shifts",
         "Customer",
+        "Company",
+        "Role",
       ];
 
       await trash.allDocs({ include_docs: true }).then(entries => {
@@ -147,6 +151,7 @@ const SyncStore = types
                 for (let i = 0; i < entries.rows.length; i += 1) {
                   if (
                     (entries.rows[i].doc.name ||
+                      entries.rows[i].doc.companyLanguage ||
                       entries.rows[i].doc.user_name ||
                       entries.rows[i].doc.status === "completed" ||
                       entries.rows[i].doc.status === "cancelled" ||
@@ -188,6 +193,74 @@ const SyncStore = types
         }
       });
       return returnResult;
+    },
+    getObjects(obj, table = "") {
+      if (obj.table === "Item") {
+        table = "items";
+      } else if (obj.table === "Category") {
+        table = "categories";
+      } else if (obj.table === "Discount") {
+        table = "discounts";
+      } else if (obj.table === "Receipt") {
+        table = "receipts";
+      } else if (obj.table === "Payment") {
+        table = "payments";
+      } else if (obj.table === "Shift") {
+        table = "shifts";
+      } else if (obj.table === "Employee") {
+        table = "attendants";
+      } else if (obj.table === "Merchant") {
+        table = "company";
+      } else if (obj.table === "Role") {
+        table = "roles";
+      }
+      let selector = self.selectorObject(obj);
+      return new Promise(function(resolve, reject) {
+        openAndSyncDB(table, true)
+          .find({
+            selector: selector,
+          })
+          .then(result => {
+            const categoryItemsReplacement = result.docs.map(item =>
+              JSON.parse(JSON.stringify(item)),
+            );
+            if (categoryItemsReplacement) {
+              resolve(categoryItemsReplacement);
+            }
+          });
+      });
+    },
+    selectorObject(obj) {
+      if ("_id" in obj) {
+        return {
+          _id: { $regex: `.*${obj._id}.*` },
+        };
+      } else if ("id" in obj) {
+        return {
+          _id: { $regex: `.*${obj.id}.*` },
+        };
+      } else if (obj.table === "Item") {
+        return {
+          name: { $regex: obj.name },
+          price: { $regex: parseInt(obj.price, 10) },
+        };
+      } else if (obj.table === "Payment") {
+        return {
+          receipt: { $regex: obj.receipt },
+        };
+      } else if (obj.table === "Employee") {
+        return {
+          user_name: { $regex: obj.user_name },
+        };
+      } else if (obj.table === "Role") {
+        return {
+          role: { $regex: obj.role },
+        };
+      } else {
+        return {
+          name: { $regex: obj.name },
+        };
+      }
     },
   }));
 

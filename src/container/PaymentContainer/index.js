@@ -8,7 +8,7 @@ import { formatNumber } from "accounting-js";
 import * as EmailValidator from "email-validator";
 import { inject, observer } from "mobx-react/native";
 import { currentLanguage } from "../../translations/CurrentLanguage";
-
+import { automatic_sync_background_job } from "../../store/SyncStore/SyncAutomatic";
 import PaymentScreen from "@screens/Payment";
 import translation from "../../translations/translation";
 import LocalizedStrings from "react-native-localization";
@@ -25,6 +25,7 @@ const moment = require("moment");
   "shiftStore",
   "attendantStore",
   "stateStore",
+  "syncStore",
 )
 @observer
 export default class PaymentContainer extends React.Component {
@@ -250,14 +251,15 @@ export default class PaymentContainer extends React.Component {
                 );
 
                 // this.props.receiptStore.defaultReceipt.clear();
-                this.props.paymentStore.add({
+                let paymentObject = {
                   receipt: this.props.receiptStore.defaultReceipt._id.toString(),
                   date: Date.now(),
                   paid: parseInt(this.props.stateStore.payment_value, 10),
                   type: this.props.stateStore.payment_state[0].selected,
                   dateUpdated: Date.now(),
                   syncStatus: false,
-                });
+                };
+                this.props.paymentStore.add(paymentObject);
                 this.props.receiptStore.add(
                   this.props.receiptStore.defaultReceipt,
                 );
@@ -272,6 +274,15 @@ export default class PaymentContainer extends React.Component {
                   this.props.printerStore.companySettings[0].tax,
                 );
                 this.props.receiptStore.setLastScannedBarcode("");
+                this.props.receiptStore.defaultReceipt.table = "Receipt";
+                paymentObject.table = "Payment";
+                automatic_sync_background_job(
+                  this.props.receiptStore.defaultReceipt,
+                  this.props,
+                  1,
+                );
+                automatic_sync_background_job(paymentObject, this.props, 2);
+
                 this.props.receiptStore.unselectReceiptLine();
                 this.props.navigation.navigate("Sales", {
                   cash: this.props.stateStore.payment_value,
@@ -762,35 +773,6 @@ export default class PaymentContainer extends React.Component {
                       ),
                     ),
                   );
-                  writePromises.push(
-                    BluetoothSerial.write(
-                      TinyPOS.bufferedText(
-                        "\n" +
-                          strings.POSProvider +
-                          "Bai Web and Mobile Lab\n" +
-                          "Insular Life Bldg, Don Apolinar\n" +
-                          "Velez cor. Oldarico Akut St.,\n" +
-                          "Cagayan de Oro, 9000,\n" +
-                          "Misamis Oriental\n" +
-                          strings.AccredNo +
-                          strings.DateIssued +
-                          strings.ValidUntil,
-                        { align: "left", size: "normal" },
-                        true,
-                      ),
-                    ),
-                  );
-                  writePromises.push(
-                    BluetoothSerial.write(
-                      TinyPOS.bufferedText(
-                        strings.ThisReceiptShallBeValidFor +
-                          strings.FiveYearsFromTheDateOf +
-                          strings.ThePermitToUse,
-                        { align: "center", size: "normal" },
-                        true,
-                      ),
-                    ),
-                  );
 
                   // Add 3 new lines
                   writePromises.push(
@@ -892,7 +874,6 @@ export default class PaymentContainer extends React.Component {
                   this.props.receiptStore.defaultReceipt.changeTaxesAmount(
                     this.props.receiptStore.defaultReceipt.get_tax_total,
                   );
-
                   // add to row
                   this.props.paymentStore.add({
                     receipt: this.props.receiptStore.defaultReceipt._id.toString(),
@@ -961,6 +942,17 @@ export default class PaymentContainer extends React.Component {
                   this.props.printerStore.companySettings[0].tax,
                 );
                 this.props.receiptStore.setLastScannedBarcode("");
+                let paymentObject = {
+                  receipt: this.props.receiptStore.defaultReceipt._id.toString(),
+                };
+                this.props.receiptStore.defaultReceipt.table = "Receipt";
+                paymentObject.table = "Payment";
+                automatic_sync_background_job(
+                  this.props.receiptStore.defaultReceipt,
+                  this.props,
+                  1,
+                );
+                automatic_sync_background_job(paymentObject, this.props, 2);
                 this.props.receiptStore.unselectReceiptLine();
                 this.props.navigation.navigate("Sales", {
                   cash: this.props.stateStore.payment_value,

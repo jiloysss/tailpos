@@ -108,11 +108,16 @@ export default class ListingContainer extends React.Component {
         });
       } else {
         this.props.categoryStore.unsetCategory();
-        index.delete();
-        Toast.show({
-          text: strings.SuccessfullyDeletedCategory,
-          duration: 5000,
-        });
+        if (this.props.printerStore.sync[0].isAutomatic) {
+          index.table = "Category";
+          this.sync_in_background_job(index, this.props, "Delete", true);
+        } else {
+          index.delete();
+          Toast.show({
+            text: strings.SuccessfullyDeletedCategory,
+            duration: 5000,
+          });
+        }
       }
     });
   };
@@ -152,6 +157,8 @@ export default class ListingContainer extends React.Component {
         dateUpdated: Date.now(),
         syncStatus: false,
       });
+      category.table = "Category";
+      this.sync_in_background_job(category, this.props, "Create");
       await this.props.categoryStore
         .searchLengthName(category.name)
         .then(result => {
@@ -184,7 +191,12 @@ export default class ListingContainer extends React.Component {
         dateUpdated: Date.now(),
         syncStatus: false,
       });
-
+      this.props.categoryStore.selectedCat.table = "Category";
+      this.sync_in_background_job(
+        this.props.categoryStore.selectedCat,
+        this.props,
+        "Edit",
+      );
       this.props.categoryStore.unsetCategory();
       this.props.stateStore.changeValue("categoryStatus", "idle", "Listing");
 
@@ -233,11 +245,16 @@ export default class ListingContainer extends React.Component {
               table_name: "Discounts",
             });
             // const discount = this.props.discountStore.rows[index];
-            index.delete();
-            Toast.show({
-              text: strings.SuccessfullyDeletedDiscount,
-              duration: 5000,
-            });
+            if (this.props.printerStore.sync[0].isAutomatic) {
+              index.table = "Discount";
+              this.sync_in_background_job(index, this.props, "Delete", true);
+            } else {
+              index.delete();
+              Toast.show({
+                text: strings.SuccessfullyDeletedDiscount,
+                duration: 5000,
+              });
+            }
           },
         },
       ],
@@ -269,6 +286,10 @@ export default class ListingContainer extends React.Component {
             dateUpdated: Date.now(),
             syncStatus: false,
           });
+          if (this.props.printerStore.sync[0].isAutomatic) {
+            discount.table = "Discount";
+            this.sync_in_background_job(discount, this.props, "Create");
+          }
           // this.setState({ discountStatus: "idle" });
           this.props.stateStore.changeValue(
             "discountStatus",
@@ -318,6 +339,14 @@ export default class ListingContainer extends React.Component {
           dateUpdated: Date.now(),
           syncStatus: false,
         });
+        if (this.props.printerStore.sync[0].isAutomatic) {
+          this.props.discountStore.selectedDiscount.table = "Discount";
+          this.sync_in_background_job(
+            this.props.discountStore.selectedDiscount,
+            this.props,
+            "Edit",
+          );
+        }
         this.props.discountStore.unsetDiscount();
         // this.setState({ discountStatus: "idle" });
         this.props.stateStore.changeValue("discountStatus", "idle", "Listing");
@@ -367,8 +396,12 @@ export default class ListingContainer extends React.Component {
     this.props.itemStore.unselectItem();
     this.props.itemStore.updateLengthDelete();
     this.props.itemStore.updateLengthObjectsDelete(index.category);
-
-    index.delete();
+    if (this.props.printerStore.sync[0].isAutomatic) {
+      index.table = "Item";
+      this.sync_in_background_job(index, this.props, "Delete", true);
+    } else {
+      index.delete();
+    }
   };
 
   onItemLongPress = index => {
@@ -384,10 +417,12 @@ export default class ListingContainer extends React.Component {
             this.props.stateStore.changeValue("itemStatus", "idle", "Listing");
 
             this.onItemDelete(index);
-            Toast.show({
-              text: strings.SuccessfullyDeletedItem,
-              duration: 5000,
-            });
+            if (!this.props.printerStore.sync[0].isAutomatic) {
+              Toast.show({
+                text: strings.SuccessfullyDeletedItem,
+                duration: 5000,
+              });
+            }
           },
         },
       ],
@@ -468,6 +503,10 @@ export default class ListingContainer extends React.Component {
               text: strings.SuccessfullyAddedNewItem,
               duration: 5000,
             });
+            if (this.props.printerStore.sync[0].isAutomatic) {
+              item.table = "Item";
+              this.sync_in_background_job(item, this.props, "Create", true);
+            }
           }
         });
       } else {
@@ -493,6 +532,10 @@ export default class ListingContainer extends React.Component {
           text: strings.SuccessfullyAddedNewItem,
           duration: 5000,
         });
+        if (this.props.printerStore.sync[0].isAutomatic) {
+          item.table = "Item";
+          this.sync_in_background_job(item, this.props, "Create", true);
+        }
       }
     } else {
       let dupBarcode = {
@@ -513,9 +556,12 @@ export default class ListingContainer extends React.Component {
         type: "danger",
       });
     }
-    automatic_sync_background_job(this.props);
   };
-
+  sync_in_background_job = (obj, props, sync_type) => {
+    if (this.props.printerStore.sync[0].isAutomatic) {
+      automatic_sync_background_job(obj, props, sync_type);
+    }
+  };
   onItemEdit = item => {
     if (item.name) {
       if (item.barcode) {
@@ -553,7 +599,13 @@ export default class ListingContainer extends React.Component {
               dateUpdated: Date.now(),
               syncStatus: false,
             });
-
+            this.props.itemStore.selectedItem.table = "Item";
+            this.sync_in_background_job(
+              this.props.itemStore.selectedItem,
+              this.props,
+              "Edit",
+              true,
+            );
             this.props.itemStore.updateLengthObjects(item.category);
             this.props.itemStore.unselectItem();
             // this.setState({ itemStatus: "idle" });
@@ -578,6 +630,14 @@ export default class ListingContainer extends React.Component {
           dateUpdated: Date.now(),
           syncStatus: false,
         });
+        this.props.itemStore.selectedItem.table = "Item";
+
+        this.sync_in_background_job(
+          this.props.itemStore.selectedItem,
+          this.props,
+          "Edit",
+          true,
+        );
 
         this.props.itemStore.updateLengthObjects(item.category);
         this.props.itemStore.unselectItem();

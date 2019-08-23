@@ -83,9 +83,51 @@ const AttendantStore = types
     clear() {
       self.rows.clear();
     },
+    async findCanLogin() {
+      let obj = await self.rows.find(data => {
+        return data.role === "Owner";
+      });
+      if (obj) {
+        return obj;
+      }
+    },
     async find(id) {
       let obj = await self.rows.find(data => {
         return data._id === id;
+      });
+      if (obj) {
+
+        return obj;
+      } else {
+        // await db.get(id).then(doc => {
+        //   if(doc){
+        //       return Attendant.create(JSON.parse(JSON.stringify(doc)));
+        //
+        //   } else {
+        //       return null;
+        //   }
+        // });
+        await db
+          .find({
+            selector: {
+              _id: { $regex: `.*${id}.*` },
+            },
+          })
+          .then(result => {
+            const { docs } = result;
+            if (docs.length > 0) {
+              return Attendant.create(
+                JSON.parse(JSON.stringify(result.docs[0])),
+              );
+            } else {
+              return null;
+            }
+          });
+      }
+    },
+    async findName(user_name) {
+      let obj = await self.rows.find(data => {
+        return data.user_name === user_name;
       });
       if (obj) {
         return obj;
@@ -98,10 +140,10 @@ const AttendantStore = types
         //       return null;
         //   }
         // });
-        db
+        await db
           .find({
             selector: {
-              _id: { $regex: `.*${id}.*` },
+              user_name: { $regex: user_name },
             },
           })
           .then(result => {
